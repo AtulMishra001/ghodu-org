@@ -1,0 +1,18 @@
+{
+  "title": "Sample post title",
+  "slug": "sample-post-title",
+  "category": "Buying Guides",
+  "status": "published",
+  "image": "./path/to/hero.webp",
+  "alt": "Describe the hero image",
+  "excerpt": "A short summary for archive cards.",
+  "tldr": "The direct answer, in a sentence or two.",
+  "keyTakeaways": ["First takeaway", "Second takeaway"],
+  "content": "<h2>First heading</h2><p>Article HTML.</p>",
+  "tags": ["Sample"],
+  "sources": ["https://example.com/source"],
+  "relatedPostSlugs": [],
+  "faqs": [{ "question": "A question?", "answer": "Its answer." }],
+  "meta": { "title": "Search result title", "description": "Search result description." },
+  "structuredData": { "title": "Schema headline", "description": "Schema description." }
+}

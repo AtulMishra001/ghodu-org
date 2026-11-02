@@ -1,26 +1,684 @@
 @import "tailwindcss";
 
+/*
+ * Theme — "Sprout · Mustard": fresh crop green, mustard-field gold, deep emerald
+ * ------------------------------------------------------------------------------
+ * Change a value here and it updates everywhere. Components should only use the
+ * semantic utilities below (bg-primary, text-muted-foreground, ...), never raw hex values.
+ *
+ * Note: accent (mustard) is for fills — buttons, badges, highlights, and text on
+ * dark `inverse` sections. Don't use it as text on white; it's too light to read.
+ */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a2414;
+
+  --surface: #ffffff;
+  --surface-muted: #edf2e4;
+  --muted-foreground: #5a6651;
+
+  --primary: #3f7d20;
+  --primary-hover: #336a19;
+  --primary-foreground: #ffffff;
+
+  --secondary: #ede4d3;
+  --secondary-foreground: #6b4a32;
+
+  --accent: #e8b923;
+  --accent-hover: #d4a514;
+  --accent-foreground: #1a2414;
+
+  --inverse: #0f2e1c;
+  --inverse-foreground: #edf2e4;
+
+  --border: #dce3d0;
+  --ring: #e8b923;
 }
 
+/* Exposes the variables above as Tailwind utilities: bg-primary, text-accent, border-border, ... */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-inverse: var(--inverse);
+  --color-inverse-foreground: var(--inverse-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Palette-independent design tokens */
+@theme {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading), ui-serif, Georgia, serif;
+
+  /* Shape: crisp and corporate, not pill-shaped */
+  --radius-card: 1rem;
+  --radius-tile: 0.75rem;
+  --radius-control: 0.75rem;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.12);
+  --shadow-elevated: 0 2px 4px rgb(0 0 0 / 0.04), 0 24px 48px -16px rgb(0 0 0 / 0.2);
+  --shadow-float: 0 -1px 0 rgb(0 0 0 / 0.04), 0 -12px 32px -16px rgb(0 0 0 / 0.18);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  /* Height of the docked mobile tab bar (without the iPhone home indicator) */
+  --tabbar-h: 4.25rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* App-like touch: no long-press callouts on tappable chrome, no image dragging */
+  a,
+  button {
+    -webkit-touch-callout: none;
+  }
+
+  img {
+    -webkit-user-drag: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Horizontal swipe rail: snaps, no visible scrollbar */
+@utility rail {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  & > * {
+    scroll-snap-align: start;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Space for the fixed mobile tab bar plus the iPhone home indicator */
+@utility pb-tabbar {
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+}
+
+/* ============================================= */
+/* Rich Text Editor (Tiptap / ProseMirror)       */
+/* ============================================= */
+
+.rte-content {
+  outline: none;
+  padding: 1rem 1.25rem;
+  min-height: inherit;
+  color: #111827;
+  line-height: 1.8;
+  font-size: 15px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.rte-content h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 0.75em 0 0.25em;
+  color: #111827;
+}
+
+.rte-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.75em 0 0.25em;
+  color: #111827;
+}
+
+.rte-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.6em 0 0.2em;
+  color: #111827;
+}
+
+.rte-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.2em;
+  color: #111827;
+}
+
+.rte-content h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.15em;
+  color: #374151;
+}
+
+.rte-content h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0.5em 0 0.15em;
+  color: #6b7280;
+}
+
+.rte-content p {
+  margin: 0.5em 0;
+}
+
+.rte-content strong {
+  font-weight: 700;
+}
+
+.rte-content em {
+  font-style: italic;
+}
+
+.rte-content u {
+  text-decoration: underline;
+}
+
+.rte-content s {
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+.rte-content code {
+  background: #f3f4f6;
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.85em;
+  color: #374151;
+}
+
+.rte-content pre {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.rte-content pre code {
+  background: none;
+  padding: 0;
+  color: #374151;
+}
+
+.rte-content ul {
+  list-style: disc;
+  padding-left: 1.6rem;
+  margin: 0.5em 0;
+}
+
+.rte-content ol {
+  list-style: decimal;
+  padding-left: 1.6rem;
+  margin: 0.5em 0;
+}
+
+.rte-content li {
+  margin: 0.2em 0;
+}
+
+.rte-content ul ul {
+  list-style: circle;
+}
+
+.rte-content ul ul ul {
+  list-style: square;
+}
+
+.rte-content blockquote {
+  border-left: 3px solid #d1d5db;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: #6b7280;
+  margin: 0.75em 0;
+  font-style: italic;
+}
+
+.rte-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.25em 0;
+}
+
+.rte-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.rte-content a:hover {
+  color: #1d4ed8;
+}
+
+.rte-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 0.75em 0;
+  display: block;
+}
+
+.rte-content img[data-align="left"] {
+  margin-right: auto;
+}
+
+.rte-content img[data-align="center"] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rte-content img[data-align="right"] {
+  margin-left: auto;
+}
+
+.rte-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  table-layout: fixed;
+}
+
+.rte-content th {
+  background: #f3f4f6;
+  padding: 0.45rem 0.75rem;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #111827;
+  width: auto !important;
+}
+
+.rte-content td {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  vertical-align: middle;
+  width: auto !important;
+}
+
+.rte-content tbody tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.rte-content .selectedCell {
+  position: relative;
+  background: #eff6ff;
+}
+
+.rte-content [style*="text-align: left"] {
+  text-align: left;
+}
+
+.rte-content [style*="text-align: center"] {
+  text-align: center;
+}
+
+.rte-content [style*="text-align: right"] {
+  text-align: right;
+}
+
+.rte-content [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+.rte-content p:first-child:last-child:empty::before {
+  content: "Start writing here...";
+  color: #9ca3af;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* Blog editor: the public article's styles (.product-description) plus what
+   only an editing surface needs, so writers see what readers will see. */
+.rte-article {
+  outline: none;
+  padding: 1rem 1.25rem;
+  min-height: inherit;
+}
+.rte-article :is(th, td) {
+  border: 1px solid var(--border);
+}
+.rte-article table {
+  table-layout: fixed;
+}
+.rte-article .selectedCell {
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+.rte-article .tableWrapper {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+}
+.rte-article p:first-child:last-child:empty::before {
+  content: "Start writing here...";
+  color: var(--muted-foreground);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* ============================================= */
+/* Public product description                    */
+/* ============================================= */
+
+@layer components {
+  /* Rich text from the admin editor, rendered on the site in its own type and
+     colours. Separate from .rte-content (the editor), so the two can differ. */
+  .product-description {
+    --prose-body: color-mix(in oklab, var(--foreground) 82%, transparent);
+    color: var(--prose-body);
+    font-size: 1rem;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+  }
+  @media (min-width: 768px) {
+    .product-description {
+      font-size: 1.0625rem;
+    }
+  }
+  .product-description > :first-child {
+    margin-top: 0;
+  }
+  .product-description > :last-child {
+    margin-bottom: 0;
+  }
+  /* The editor leaves an empty paragraph after a block; it shouldn't add space. */
+  .product-description p:empty {
+    display: none;
+  }
+
+  /* Headings: the display serif for sections, the body sans for sub-points */
+  .product-description :is(h1, h2, h3, h4, h5, h6) {
+    color: var(--foreground);
+    scroll-margin-top: 6rem;
+    text-wrap: balance;
+  }
+  .product-description :is(h1, h2) {
+    font-family: var(--font-heading), ui-serif, Georgia, serif;
+    font-weight: 500;
+    font-size: 1.625rem;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 2.25rem 0 0.75rem;
+  }
+  .product-description h1 {
+    font-size: 1.875rem;
+  }
+  .product-description h3 {
+    font-family: var(--font-heading), ui-serif, Georgia, serif;
+    font-weight: 500;
+    font-size: 1.375rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 2.25rem 0 0.625rem;
+  }
+  .product-description :is(h4, h5, h6) {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 1.75rem 0 0.5rem;
+  }
+  @media (min-width: 768px) {
+    .product-description :is(h1, h2) {
+      font-size: 2rem;
+    }
+    .product-description h3 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .product-description p {
+    margin: 0.875rem 0;
+  }
+  .product-description :is(strong, b) {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .product-description s {
+    color: var(--muted-foreground);
+  }
+  .product-description a {
+    color: var(--primary);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in oklab, var(--primary) 40%, transparent);
+    transition: text-decoration-color 0.2s;
+  }
+  .product-description a:hover {
+    text-decoration-color: var(--primary);
+  }
+
+  /* Lists: a green leaf-dot for bullets, numbered tiles for steps */
+  .product-description :is(ul, ol) {
+    margin: 1rem 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.625rem;
+  }
+  .product-description li {
+    position: relative;
+    padding-left: 2.25rem;
+  }
+  .product-description li > p {
+    margin: 0;
+  }
+  .product-description ul > li::before {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    top: 0.6em;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px 0;
+    background: var(--primary);
+  }
+  .product-description ol {
+    counter-reset: step;
+  }
+  .product-description ol > li {
+    counter-increment: step;
+  }
+  .product-description ol > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0.125em;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--primary) 12%, transparent);
+    color: var(--primary);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .product-description :is(ul, ol) :is(ul, ol) {
+    margin: 0.5rem 0 0;
+  }
+  .product-description ul ul > li::before {
+    background: transparent;
+    border: 1.5px solid var(--primary);
+  }
+
+  /* Quotes become a callout card with a mustard edge */
+  .product-description blockquote {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 0 var(--radius-tile) var(--radius-tile) 0;
+    border-left: 4px solid var(--accent);
+    background: var(--surface-muted);
+    color: var(--foreground);
+    font-family: var(--font-heading), ui-serif, Georgia, serif;
+    font-size: 1.125em;
+    line-height: 1.5;
+  }
+  .product-description blockquote p {
+    margin: 0.5rem 0;
+  }
+  .product-description blockquote > :first-child {
+    margin-top: 0;
+  }
+  .product-description blockquote > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Tables: a bordered card that scrolls sideways on phones */
+  .product-description .table-scroll {
+    margin: 1.25rem 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--surface);
+  }
+  .product-description table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  .product-description .table-scroll table {
+    min-width: 32rem;
+  }
+  .product-description :is(th, td) {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .product-description :is(th, td) p {
+    margin: 0;
+  }
+  .product-description th {
+    background: var(--surface-muted);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .product-description tr + tr > :is(td, th) {
+    border-top: 1px solid var(--border);
+  }
+  .product-description td:first-child {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .product-description tbody tr:has(td):hover {
+    background: color-mix(in oklab, var(--surface-muted) 45%, transparent);
+  }
+
+  .product-description hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+  .product-description img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem 0;
+    border-radius: var(--radius-card);
+  }
+  .product-description img[data-align="center"] {
+    margin-inline: auto;
+  }
+  .product-description img[data-align="right"] {
+    margin-left: auto;
+  }
+  .product-description code {
+    padding: 0.1em 0.35em;
+    border-radius: 0.375rem;
+    background: var(--surface-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875em;
+  }
+  .product-description pre {
+    margin: 1.25rem 0;
+    padding: 1rem;
+    border-radius: var(--radius-tile);
+    background: var(--surface-muted);
+    overflow-x: auto;
+  }
+  .product-description pre code {
+    padding: 0;
+    background: none;
+  }
+
+  /* Inside the product page's scrolling card: tighter than a full-page read */
+  .description-panel {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .description-panel .product-description :is(h1, h2) {
+    font-size: 1.375rem;
+    margin: 1.75rem 0 0.5rem;
+  }
+  .description-panel .product-description h3 {
+    font-size: 1.1875rem;
+    margin: 1.5rem 0 0.375rem;
+  }
+  .description-panel .product-description > :first-child {
+    margin-top: 0;
+  }
+}
+
+/* Blog article additions to the shared rich-text styles */
+@layer components {
+  .article-body :is(h2, h3):focus {
+    outline: none;
+  }
+  .article-body img[data-align="left"] {
+    margin-right: auto;
+  }
 }

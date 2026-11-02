@@ -1,0 +1,19 @@
+{
+  "site": "ghoduagro (new site)",
+  "vertical": "B2B agricultural produce supplier, Kashmir",
+  "audience": "procurement managers, traders, distributors and food brands buying in bulk, comparing suppliers on phone and desktop",
+  "job": "send a bulk enquiry / request a quote",
+  "proof": "origin (Kashmir valley), seasonality of harvest, product specs — no company stats published yet",
+  "personality": ["grounded", "dependable", "premium"],
+  "fonts": { "heading": "Newsreader", "body": "Figtree" },
+  "colors": { "paper": "#ffffff", "ink": "#1a2414", "accent": "#3f7d20", "pop": "#e8b923" },
+  "shape": { "card": "crisp", "control": "crisp" },
+  "surfaces": "hairline-outlined",
+  "card_style": "photo-top-spec-sheet-rows",
+  "nav": { "form": "docked-with-top-indicator", "active": "underline-bar", "center_action": "cart-with-count-badge" },
+  "hero": "full-bleed-photo-with-today-card",
+  "signature": "harvest-calendar-month-strip",
+  "motion": "calm",
+  "section_header": "kicker-number-plus-title",
+  "icons": "phosphor-light-to-duotone"
+}
