@@ -25,6 +25,9 @@ type ContactValue = {
   goToForm: () => void;
 };
 
+/** Fired when something asks to go to the form, which on phones means moving the flow on. */
+export const TO_FORM_EVENT = "contact:to-form";
+
 const ContactContext = createContext<ContactValue | null>(null);
 
 export function useContactForm() {
@@ -89,7 +92,10 @@ export default function ContactProvider({
         setLines([]);
         setValues({});
       },
-      goToForm: () => document.getElementById("enquiry")?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      goToForm: () => {
+        window.dispatchEvent(new Event(TO_FORM_EVENT));
+        document.getElementById("enquiry")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      },
     };
   }, [products, intents, intent, lines, values, status]);
 

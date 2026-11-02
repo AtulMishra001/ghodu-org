@@ -17,7 +17,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         <AppBar logo={<Logo priority />} />
       </Suspense>
       <main className="flex-1">{children}</main>
-      <div className="pb-tabbar md:pb-0">
+      <div data-chrome data-footer className="pb-tabbar md:pb-0">
         <Footer credits={photoCredits(products)} />
       </div>
       <Suspense>
@@ -29,7 +29,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
 
 function AppBarFallback() {
   return (
-    <div className="sticky top-0 z-40 bg-background" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div data-chrome className="sticky top-0 z-40 bg-background" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       <div className="mx-auto flex h-14 max-w-[1800px] items-center px-4 md:h-[72px] md:px-6 xl:px-10">
         <Logo />
       </div>

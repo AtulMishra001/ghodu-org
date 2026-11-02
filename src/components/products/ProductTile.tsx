@@ -27,7 +27,7 @@ export default function ProductTile({ product, index }: { product: Product; inde
       className="min-w-0"
     >
       <article className="group relative">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-card bg-inverse text-inverse-foreground">
+        <div className="relative aspect-square overflow-hidden rounded-card bg-inverse md:aspect-[4/5] text-inverse-foreground">
           <Image
             {...photoProps(product.image)}
             alt={product.image.alt}
@@ -84,12 +84,12 @@ export default function ProductTile({ product, index }: { product: Product; inde
           </div>
         </div>
 
-        <div className="px-0.5 pt-2.5 md:pt-3">
+        <div className="px-0.5 pt-1.5 md:pt-3">
           <div className="flex items-baseline justify-between gap-2 text-xs md:text-sm">
             <span className="truncate font-semibold">{product.forms.join(" · ")}</span>
-            <span className="shrink-0 text-muted-foreground">{product.category}</span>
+            <span className="shrink-0 text-muted-foreground max-md:hidden">{product.category}</span>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 max-md:hidden">
             <MonthBar harvest={product.harvest} highlight={month} />
           </div>
         </div>

@@ -10,6 +10,7 @@ import { seasonLabel } from "@/lib/season";
 import { useMonth } from "@/lib/use-month";
 
 // The year as twelve blocks: harvest months filled, this month marked.
+// Desktop only; phones get the compact strip in the Overview tab.
 export default function HarvestSeason({ product }: { product: Product }) {
   const month = useMonth();
   const until = monthsToHarvest(product.harvest, month);
@@ -21,7 +22,7 @@ export default function HarvestSeason({ product }: { product: Product }) {
         : `Next harvest begins in ${monthNames[(month + until!) % 12]}, ${until} month${until === 1 ? "" : "s"} from now.`;
 
   return (
-    <Section id="season">
+    <Section id="season" className="max-md:hidden">
       <SectionHeader index="04" kicker="Season" title="When it's harvested" summary={line} />
       <ol className="mt-5 grid grid-cols-6 gap-1.5 sm:grid-cols-12 md:gap-2" aria-label={`Harvest months: ${seasonLabel(product.harvest)}`}>
         {months.map((m, i) => {

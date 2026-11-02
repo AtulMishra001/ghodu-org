@@ -23,7 +23,7 @@ export default function CatalogueResults() {
   ].filter(Boolean);
 
   return (
-    <div className={`${container} pt-4 md:pt-5`}>
+    <div className={`${container} pt-1.5 md:pt-5`}>
       <div className="flex min-h-8 items-center justify-between gap-3 text-sm">
         <p className="truncate text-muted-foreground" aria-live="polite">
           <span className="font-semibold text-foreground tabular">
@@ -47,7 +47,7 @@ export default function CatalogueResults() {
         </AnimatePresence>
       </div>
 
-      <div className="mt-3">
+      <div className="mt-1 md:mt-3">
         {shown.length === 0 ? (
           <EmptyState />
         ) : (
@@ -60,7 +60,7 @@ export default function CatalogueResults() {
               transition={{ duration: 0.25 }}
             >
               {view === "grid" ? (
-                <motion.ul layout className="grid grid-cols-2 gap-x-2.5 gap-y-5 md:grid-cols-3 md:gap-x-4 md:gap-y-7 xl:grid-cols-4 2xl:grid-cols-5">
+                <motion.ul layout className="grid grid-cols-2 gap-x-2.5 gap-y-3 md:grid-cols-3 md:gap-x-4 md:gap-y-7 xl:grid-cols-4 2xl:grid-cols-5">
                   <AnimatePresence mode="popLayout" initial={false}>
                     {shown.map((p, i) => (
                       <ProductTile key={p.slug} product={p} index={i} />

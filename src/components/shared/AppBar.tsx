@@ -20,9 +20,21 @@ function parentPath(pathname: string) {
   return parts.length > 1 ? `/${parts.slice(0, -1).join("/")}` : "/";
 }
 
-export default function AppBar({ logo }: { logo: ReactNode }) {
+/** Back to the previous screen, or up a level when this one was opened directly. */
+export function useGoBack() {
   const pathname = usePathname();
   const router = useRouter();
+  return () => {
+    haptic(5);
+    setNavDirection(-1);
+    if (window.history.length > 1 && document.referrer.startsWith(window.location.origin)) router.back();
+    else router.push(parentPath(pathname));
+  };
+}
+
+export default function AppBar({ logo }: { logo: ReactNode }) {
+  const pathname = usePathname();
+  const goBack = useGoBack();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const quote = useQuote();
@@ -30,15 +42,9 @@ export default function AppBar({ logo }: { logo: ReactNode }) {
 
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 4));
 
-  function goBack() {
-    haptic(5);
-    setNavDirection(-1);
-    if (window.history.length > 1 && document.referrer.startsWith(window.location.origin)) router.back();
-    else router.push(parentPath(pathname));
-  }
-
   return (
     <header
+      data-chrome
       className={`sticky top-0 z-40 transition-[background-color,border-color] duration-300 ${
         scrolled ? "border-b bg-background/85 backdrop-blur-xl backdrop-saturate-150" : "border-b border-transparent bg-background"
       }`}

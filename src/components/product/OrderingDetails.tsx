@@ -31,42 +31,47 @@ export default function OrderingDetails({ product }: { product: Product }) {
   ];
 
   return (
-    <Section id="ordering">
-      <SectionHeader
-        index="03"
-        kicker="How to order"
-        title="Ordering terms"
-        summary="Terms are confirmed in writing before anything is dispatched."
-      />
+    <Section id="ordering" className="max-md:pt-3 max-md:pb-4">
+      <div className="max-md:sr-only">
+        <SectionHeader
+          index="03"
+          kicker="How to order"
+          title="Ordering terms"
+          summary="Terms are confirmed in writing before anything is dispatched."
+        />
+      </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 md:mt-5 md:gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        {/* Hairline cells on phones, like the spec sheet; separate cards from md up. */}
+        <div className="overflow-hidden rounded-card border md:overflow-visible md:rounded-none md:border-0">
+        <div className="-mr-px -mb-px grid grid-cols-2 md:m-0 md:gap-3">
           {cards.map((c, i) => (
-            <Reveal key={c.label} delay={i * 0.04} className={i === cards.length - 1 && cards.length % 2 ? "sm:col-span-2" : ""}>
-              <div className="flex h-full gap-3.5 rounded-card border bg-surface p-4 md:p-5">
-                <span className="grid size-11 shrink-0 place-items-center rounded-tile bg-primary/8 text-primary">
+            <Reveal key={c.label} delay={i * 0.04} className={i === cards.length - 1 && cards.length % 2 ? "col-span-2" : ""}>
+              <div className="flex h-full gap-3.5 border-r border-b px-3 py-2.5 md:rounded-card md:border md:bg-surface md:p-5">
+                <span className="grid size-11 shrink-0 place-items-center rounded-tile bg-primary/8 text-primary max-md:hidden">
                   <c.icon size={22} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm text-muted-foreground">{c.label}</p>
-                  <p className={`text-lg leading-snug font-semibold ${c.value === ON_REQUEST ? "font-normal text-muted-foreground" : ""}`}>{c.value}</p>
-                  {c.note && <p className="mt-0.5 text-sm text-muted-foreground">{c.note}</p>}
+                  <p className="text-xs text-muted-foreground md:text-sm">{c.label}</p>
+                  <p className={`text-sm leading-snug font-semibold md:text-lg ${c.value === ON_REQUEST ? "font-normal text-muted-foreground" : ""}`}>{c.value}</p>
+                  {c.note && <p className="text-xs text-muted-foreground md:mt-0.5 md:text-sm">{c.note}</p>}
                 </div>
               </div>
             </Reveal>
           ))}
         </div>
+        </div>
 
         <Reveal delay={0.1} className="flex flex-col gap-3">
-          <div className="rounded-card border bg-surface p-4 md:p-5">
+          <div className="rounded-card border bg-surface px-3 py-2.5 md:p-5">
             <p className="flex items-center gap-2 text-sm font-semibold">
               <PackageIcon size={20} className="text-primary" />
               Packing options
             </p>
             {o?.packaging.length ? (
-              <ul className="mt-3 divide-y">
+              <ul className="mt-1 divide-y md:mt-3">
                 {o.packaging.map((p) => (
-                  <li key={p.label} className="flex items-center justify-between gap-3 py-2.5 text-[15px]">
+                  <li key={p.label} className="flex items-center justify-between gap-3 py-2 text-sm md:py-2.5 md:text-[15px]">
                     <span>{p.label}</span>
                     <span className="shrink-0 font-semibold tabular">{formatQuantity(p.size)}</span>
                   </li>
@@ -77,9 +82,9 @@ export default function OrderingDetails({ product }: { product: Product }) {
             )}
           </div>
           {o?.notes && (
-            <div className="rounded-card bg-inverse p-4 text-inverse-foreground md:p-5">
+            <div className="rounded-card bg-inverse px-3 py-2.5 text-inverse-foreground md:p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Good to know</p>
-              <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line text-inverse-foreground/85">{o.notes}</p>
+              <p className="mt-1 text-sm leading-relaxed whitespace-pre-line text-inverse-foreground/85 md:mt-2 md:text-[15px]">{o.notes}</p>
             </div>
           )}
         </Reveal>

@@ -66,6 +66,7 @@ export default function TabBar() {
 
   return (
     <motion.nav
+      data-chrome
       aria-label="Main"
       initial={false}
       animate={{ y: hidden ? "110%" : "0%" }}

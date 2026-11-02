@@ -43,12 +43,13 @@ export default function ProductGallery({ photos, name }: { photos: Photo[]; name
 
   return (
     <div>
+      {/* On phones the photo takes the height the Overview tab leaves free, so that tab fits one screen. */}
       <motion.div
         drag={many ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.15}
         onDragEnd={onSwipe}
-        className="group relative aspect-4/3 touch-pan-y overflow-hidden bg-surface-muted md:rounded-card lg:aspect-auto lg:h-[clamp(360px,calc(100dvh-15rem),600px)]"
+        className="group relative h-[clamp(8.5rem,calc(100svh-28.5rem-env(safe-area-inset-bottom)),40svh)] touch-pan-y overflow-hidden bg-surface-muted md:aspect-4/3 md:h-auto md:rounded-card lg:aspect-auto lg:h-[clamp(360px,calc(100dvh-15rem),600px)]"
       >
         <AnimatePresence initial={false}>
           <motion.div key={index} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} className="absolute inset-0">
@@ -75,7 +76,7 @@ export default function ProductGallery({ photos, name }: { photos: Photo[]; name
 
         {many && (
           <>
-            <span className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 md:hidden">
+            <span className="pointer-events-none absolute bottom-7 left-1/2 flex -translate-x-1/2 gap-1.5 md:hidden">
               {photos.map((_, i) => (
                 <span key={i} className={`h-1.5 rounded-full bg-background transition-all ${i === index ? "w-5" : "w-1.5 opacity-60"}`} />
               ))}

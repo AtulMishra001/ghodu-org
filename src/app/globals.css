@@ -137,6 +137,43 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* A screen marked data-immersive brings its own top bar and dock on phones, so
+   the site's app bar, tab bar and footer step aside (a native detail screen).
+   Next keeps the last screen in the DOM with an inline display:none after
+   navigating away, and a hidden screen must not count. */
+@media (max-width: 767.98px) {
+  body:has([data-immersive]:not([style*="display: none"], [style*="display: none"] [data-immersive])) [data-chrome] {
+    display: none;
+  }
+}
+
+/* A full-screen page (no scrolling) has no room for the footer strip. */
+@media (max-width: 767.98px) {
+  body:has([data-fullscreen]:not([style*="display: none"], [style*="display: none"] [data-fullscreen])) [data-footer] {
+    display: none;
+  }
+}
+
+/* Height left between the site's app bar and tab bar on a phone. */
+@utility h-app-screen {
+  height: calc(100svh - 3.5rem - var(--tabbar-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+/* One step of the contact flow arriving; --step-dir says which side from.
+   Restarts by itself whenever a step goes from hidden to shown. */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--step-dir, 1) * 1.5rem));
+  }
+}
+@utility animate-step-in {
+  animation: step-in 0.35s var(--ease-premium);
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
 /* Space for the fixed mobile tab bar plus the iPhone home indicator */
 @utility pb-tabbar {
   padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
@@ -680,5 +717,11 @@
   }
   .article-body img[data-align="left"] {
     margin-right: auto;
+  }
+  /* Reader text size, set from the phone's reader bar. */
+  @media (max-width: 767.98px) {
+    .article-body {
+      font-size: calc(1rem * var(--reader-scale, 1));
+    }
   }
 }

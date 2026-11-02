@@ -29,7 +29,7 @@ export default function CatalogueToolbar({
     <>
       <div className="sticky top-14 z-30 border-b bg-background/92 backdrop-blur-md md:top-[72px]">
         <div
-          className={`${container} flex flex-col gap-2.5 py-2.5 md:flex-row md:items-center md:gap-3 md:py-3`}
+          className={`${container} flex flex-col gap-2 py-2 md:flex-row md:items-center md:gap-3 md:py-3`}
         >
           <CategoryTabs categories={categories} />
 

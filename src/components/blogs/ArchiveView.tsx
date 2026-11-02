@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRightIcon, NotebookIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRightIcon, NotebookIcon, NewspaperIcon, QuestionIcon, SealCheckIcon } from "@phosphor-icons/react/dist/ssr";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import FaqAccordion from "@/components/shared/FaqAccordion";
 import JsonLd from "@/components/shared/JsonLd";
 import Section from "@/components/shared/Section";
+import SheetRow from "@/components/shared/SheetRow";
 import SectionHeader from "@/components/shared/SectionHeader";
 import { blogArchive, BLOG_AUTHOR } from "@/data/blog";
 import { getPublishedBlogs } from "@/data/blog-posts";
@@ -57,23 +58,25 @@ export default async function ArchiveView({ page = 1, category }: { page?: numbe
       {isRoot && <JsonLd data={faqPageSchema(blogArchive.faqs)} />}
 
       {/* ---------- hero ---------- */}
-      <section className={`${container} pt-4 md:pt-6`}>
-        <Breadcrumbs items={crumbs} />
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-10">
+      <section className={`${container} pt-1 md:pt-6`}>
+        <div className="max-md:hidden">
+          <Breadcrumbs items={crumbs} />
+        </div>
+        <div className="grid gap-6 md:mt-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-10">
           <div className="flex flex-col justify-end">
-            <p className="flex flex-wrap items-center gap-2 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
+            <p className="flex flex-wrap items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-primary uppercase md:text-xs">
               {blogArchive.label}
               <span className="h-px w-6 bg-primary/40" />
               <span className="tabular">
                 {posts.length} {noun}
               </span>
             </p>
-            <h1 className="mt-3 font-display text-[38px] leading-[1.05] font-medium tracking-tight text-balance md:text-[56px] 2xl:text-[68px]">
+            <h1 className="mt-1 font-display text-[24px] leading-[1.1] font-medium tracking-tight text-balance md:mt-3 md:text-[56px] md:leading-[1.05] 2xl:text-[68px]">
               {current ? current.name : blogArchive.title}
             </h1>
-            <p className="mt-3 max-w-3xl text-[17px] leading-relaxed text-muted-foreground md:text-lg">{blogArchive.answer}</p>
+            <p className="mt-3 max-w-3xl text-[17px] leading-relaxed text-muted-foreground max-md:hidden md:text-lg">{blogArchive.answer}</p>
             {categories.length > 0 && (
-              <ul aria-label="Filter by category" className="mt-5 flex flex-wrap gap-2">
+              <ul aria-label="Filter by category" className="mt-5 flex flex-wrap gap-2 max-md:hidden">
                 <li>
                   <Link href="/blogs" aria-current={!category ? "page" : undefined} className={`${pillBase} block ${!category ? "border-primary bg-primary text-primary-foreground" : "bg-surface hover:border-foreground/40"}`}>
                     All
@@ -95,15 +98,38 @@ export default async function ArchiveView({ page = 1, category }: { page?: numbe
         </div>
       </section>
 
+      {/* Phones: the categories stay within reach, stuck under the app bar while the feed scrolls. */}
+      {categories.length > 0 && (
+        <nav aria-label="Article categories" className="sticky top-14 z-20 mt-2 border-b bg-background md:hidden">
+          <ul className="rail scroll-pl-4 gap-1 px-4">
+            {[{ slug: "", name: "All" }, ...categories].map((c) => {
+              const on = c.slug === (category ?? "");
+              return (
+                <li key={c.slug} className="shrink-0">
+                  <Link
+                    href={c.slug ? archivePath(1, c.slug) : "/blogs"}
+                    aria-current={on ? "page" : undefined}
+                    className={`relative block px-2.5 py-2.5 text-sm font-semibold whitespace-nowrap ${on ? "text-foreground" : "text-muted-foreground"}`}
+                  >
+                    {c.name}
+                    {on && <span className="absolute inset-x-2.5 bottom-0 h-0.5 bg-primary" />}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
+
       {/* ---------- posts ---------- */}
-      <Section id="posts">
+      <Section id="posts" className="max-md:pt-3">
         <ScrollToGrid />
         {visible.length ? (
           <>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {visible.map((post) => (
-                <li key={post.slug}>
-                  <BlogCard post={post} />
+            <ul className="grid gap-4 max-md:gap-0 max-md:divide-y md:grid-cols-2 lg:grid-cols-4">
+              {visible.map((post, i) => (
+                <li key={post.slug} className={i === 0 ? "max-md:pb-1" : ""}>
+                  <BlogCard post={post} variant={i === 0 ? "lead" : "row"} />
                 </li>
               ))}
             </ul>
@@ -121,7 +147,60 @@ export default async function ArchiveView({ page = 1, category }: { page?: numbe
         )}
       </Section>
 
+      {/* ---------- phones: the feed's small print, in sheets ---------- */}
+      <section aria-label="About this journal" className="mx-4 mt-2 mb-4 divide-y border-y md:hidden">
+        <SheetRow icon={<NewspaperIcon size={22} weight="duotone" />} title={blogArchive.whatWePublish.title} hint={blogArchive.whatWePublish.items.map((item) => item.title).join(", ")}>
+          <p className="text-[15px] text-muted-foreground">{blogArchive.whatWePublish.summary}</p>
+          <ul className="mt-2 divide-y pb-2">
+            {blogArchive.whatWePublish.items.map((item) => (
+              <li key={item.title} className="py-3">
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="mt-0.5 text-[15px] leading-relaxed text-muted-foreground">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </SheetRow>
+        <SheetRow icon={<SealCheckIcon size={22} weight="duotone" />} title={blogArchive.editorial.title} hint={BLOG_AUTHOR.name}>
+          <p className="text-[15px] leading-relaxed text-muted-foreground">{blogArchive.editorial.body}</p>
+          <Link href={BLOG_AUTHOR.profileUrl} className="mt-3 mb-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+            About the {BLOG_AUTHOR.name}
+            <ArrowRightIcon size={14} weight="bold" />
+          </Link>
+        </SheetRow>
+        <SheetRow icon={<QuestionIcon size={22} weight="duotone" />} title="Questions about the blog" hint={`${blogArchive.faqs.length} common questions`}>
+          <FaqAccordion faqs={blogArchive.faqs} />
+        </SheetRow>
+      </section>
+
+      {/* ---------- phones: where to go next, as a swipeable row ---------- */}
+      <nav aria-label="Next steps" className="pb-4 md:hidden">
+        <h2 className="px-4 text-sm font-semibold">{blogArchive.guidance.title}</h2>
+        <ul className="rail mt-2 scroll-pl-4 gap-2 px-4">
+          {blogArchive.guidance.cards.map((c) => (
+            <li key={c.href} className="w-[58%] shrink-0">
+              <Link href={c.href} className="flex h-full flex-col rounded-card border p-3 transition active:scale-[0.98]">
+                <span className="font-display text-lg leading-tight font-medium">{c.title}</span>
+                <span className="mt-auto flex items-center gap-1 pt-2 text-sm font-semibold text-primary">
+                  {c.cta}
+                  <ArrowRightIcon size={14} weight="bold" />
+                </span>
+              </Link>
+            </li>
+          ))}
+          <li className="w-[58%] shrink-0">
+            <Link href={blogArchive.guidance.contact.href} className="flex h-full flex-col rounded-card bg-inverse p-3 text-inverse-foreground transition active:scale-[0.98]">
+              <span className="font-display text-lg leading-tight font-medium">{blogArchive.guidance.contact.title}</span>
+              <span className="mt-auto flex items-center gap-1 pt-2 text-sm font-semibold text-accent">
+                {blogArchive.guidance.contact.cta}
+                <ArrowRightIcon size={14} weight="bold" />
+              </span>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+
       {/* ---------- what we publish ---------- */}
+      <div className="max-md:hidden">
       <Section>
         <SectionHeader index="01" kicker="Coverage" title={blogArchive.whatWePublish.title} summary={blogArchive.whatWePublish.summary} />
         <ul className="mt-5 grid border-t sm:grid-cols-2 xl:grid-cols-4">
@@ -180,6 +259,7 @@ export default async function ArchiveView({ page = 1, category }: { page?: numbe
           </div>
         </div>
       </Section>
+      </div>
     </>
   );
 }

@@ -3,11 +3,15 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import HarvestSeason from "@/components/product/HarvestSeason";
 import OrderingDetails from "@/components/product/OrderingDetails";
+import ProductDock from "@/components/product/ProductDock";
 import ProductDetails from "@/components/product/ProductDetails";
 import ProductFaq from "@/components/product/ProductFaq";
 import ProductSpecs from "@/components/product/ProductSpecs";
 import ProductHero from "@/components/product/ProductHero";
+import ProductOverview from "@/components/product/ProductOverview";
+import ProductPager, { type PagerTab } from "@/components/product/ProductPager";
 import ProductSkeleton from "@/components/product/ProductSkeleton";
+import ProductTopBar from "@/components/product/ProductTopBar";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import { getProductBySlug, getProducts, getRelatedProducts } from "@/data/catalogue";
 import { site } from "@/data/site";
@@ -64,16 +68,33 @@ async function Product({ params }: Pick<PageProps<"/products/[slug]">, "params">
     additionalProperty: (product.specs ?? []).map((s) => ({ "@type": "PropertyValue", name: s.label, value: s.value })),
   };
 
+  // Swipeable tabs on phones; on desktop the same panels stack as sections,
+  // with the overview's content in the hero and the season after the terms.
+  const tabs: PagerTab[] = [
+    { id: "overview", label: "Overview", node: <ProductOverview product={product} /> },
+    { id: "about", label: "Details", node: <ProductDetails product={product} /> },
+    { id: "specs", label: "Specs", node: <ProductSpecs product={product} /> },
+    {
+      id: "terms",
+      label: "Ordering",
+      node: (
+        <>
+          <OrderingDetails product={product} />
+          <HarvestSeason product={product} />
+        </>
+      ),
+    },
+    ...(product.faqs?.length ? [{ id: "faq", label: "FAQ", node: <ProductFaq product={product} /> }] : []),
+  ];
+
   return (
-    <>
+    <div data-immersive className="flex flex-col max-md:min-h-dvh">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <ProductTopBar name={product.name} />
       <ProductHero product={product} />
-      <ProductDetails product={product} />
-      <ProductSpecs product={product} />
-      <OrderingDetails product={product} />
-      <HarvestSeason product={product} />
-      <ProductFaq product={product} />
+      <ProductPager tabs={tabs} />
       <RelatedProducts products={related} line={product.category} index={product.faqs?.length ? "06" : "05"} />
-    </>
+      <ProductDock product={product} />
+    </div>
   );
 }

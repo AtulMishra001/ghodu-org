@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import AboutClosing from "@/components/about-us/AboutClosing";
 import AboutHero from "@/components/about-us/AboutHero";
+import AboutStories from "@/components/about-us/AboutStories";
 import FounderNote from "@/components/about-us/FounderNote";
 import JourneyPanels from "@/components/about-us/JourneyPanels";
 import NumbersBand from "@/components/about-us/NumbersBand";
@@ -20,6 +21,8 @@ export default async function AboutUsPage() {
 
   return (
     <>
+      <AboutStories content={content} />
+      <div className="max-md:hidden">
       <AboutHero hero={content.hero} />
       <StoryChapters story={content.story} />
       <FounderNote note={content.note} />
@@ -28,6 +31,7 @@ export default async function AboutUsPage() {
       <NumbersBand numbers={content.numbers} />
       <FaqSection index="06" title="Getting to know us" faqs={content.faqs} aside={<FaqPhoto photo={content.faqImage} />} />
       <AboutClosing closing={content.closing} />
+      </div>
     </>
   );
 }

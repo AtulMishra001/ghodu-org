@@ -16,6 +16,7 @@ export default function FaqSection({
   aside,
   id = "questions",
   className,
+  headerClassName,
 }: {
   index: string;
   kicker?: string;
@@ -25,6 +26,7 @@ export default function FaqSection({
   aside?: ReactNode;
   id?: string;
   className?: string;
+  headerClassName?: string;
 }) {
   if (!faqs.length) return null;
   return (
@@ -32,7 +34,9 @@ export default function FaqSection({
       <JsonLd data={faqPageSchema(faqs)} />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-10">
         <div className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
-          <SectionHeader index={index} kicker={kicker} title={title} summary={summary} />
+          <div className={headerClassName}>
+            <SectionHeader index={index} kicker={kicker} title={title} summary={summary} />
+          </div>
           {aside}
         </div>
         <FaqAccordion faqs={faqs} />

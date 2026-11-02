@@ -5,7 +5,8 @@ import type { DescriptionHeading } from "@/lib/rich-text";
 
 // The description as a self-contained card: its content scrolls inside, with
 // the headings as tabs along the top. On desktop the card fills its grid row,
-// so it always ends level with the enquiry form beside it.
+// so it always ends level with the enquiry form beside it. On phones the tab it
+// sits in already gives it a screen of its own, so it's plain flowing text.
 export default function DescriptionPanel({ label, outline, children }: { label: string; outline: DescriptionHeading[]; children: ReactNode }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
@@ -50,9 +51,9 @@ export default function DescriptionPanel({ label, outline, children }: { label: 
   }
 
   return (
-    <div className="flex h-[28rem] flex-col overflow-hidden rounded-card border bg-surface md:h-[32rem] lg:absolute lg:inset-0 lg:h-auto">
+    <div className="flex flex-col overflow-hidden md:h-[32rem] md:rounded-card md:border md:bg-surface lg:absolute lg:inset-0 lg:h-auto">
       {outline.length > 0 && (
-        <nav aria-label={`${label} sections`} className="shrink-0 border-b">
+        <nav aria-label={`${label} sections`} className="shrink-0 border-b max-md:hidden">
           <div ref={rail} className="relative flex gap-1 overflow-x-auto px-2 [scrollbar-width:none] md:px-3 [&::-webkit-scrollbar]:hidden">
             {outline.map((item) => {
               const current = item.id === active;
@@ -82,12 +83,12 @@ export default function DescriptionPanel({ label, outline, children }: { label: 
           role="region"
           aria-label={label}
           tabIndex={0}
-          className="description-panel h-full overflow-y-auto p-4 outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset md:p-6"
+          className="description-panel px-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-inset md:h-full md:overflow-y-auto md:p-6"
         >
           {children}
         </div>
         {/* Hints there's more below; clears once the end is reached. */}
-        <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t from-surface to-transparent transition-opacity duration-200 ${atEnd ? "opacity-0" : "opacity-100"}`} />
+        <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t max-md:hidden from-surface to-transparent transition-opacity duration-200 ${atEnd ? "opacity-0" : "opacity-100"}`} />
       </div>
     </div>
   );

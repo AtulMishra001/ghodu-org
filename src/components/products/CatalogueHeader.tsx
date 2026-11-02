@@ -12,7 +12,8 @@ import { photoProps } from "@/lib/photo";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 // Editorial title row, then one large photo "door" per line of business.
-// A door filters the catalogue below and scrolls to it.
+// A door filters the catalogue below and scrolls to it. On phones the sticky
+// toolbar does that job, so only a compact title sits above the shelf.
 export default function CatalogueHeader({ intro, categories }: Pick<Catalogue, "intro" | "categories">) {
   const { products, category, setCategory } = useCatalogue();
 
@@ -23,7 +24,7 @@ export default function CatalogueHeader({ intro, categories }: Pick<Catalogue, "
   }
 
   return (
-    <section className={`${container} pt-4 md:pt-8`}>
+    <section className={`${container} pt-1 md:pt-8`}>
       <div className="grid gap-3 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-end md:gap-10">
         <div>
           <motion.p
@@ -42,7 +43,7 @@ export default function CatalogueHeader({ intro, categories }: Pick<Catalogue, "
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.08, ease }}
-            className="mt-2 max-w-3xl font-display text-[30px] leading-[1.05] font-medium tracking-tight text-balance md:text-[48px] xl:text-[56px]"
+            className="mt-1 max-w-3xl font-display text-[22px] leading-[1.1] md:mt-2 md:text-[30px] md:leading-[1.05] font-medium tracking-tight text-balance md:text-[48px] xl:text-[56px]"
           >
             {intro.title}
           </motion.h1>
@@ -51,13 +52,13 @@ export default function CatalogueHeader({ intro, categories }: Pick<Catalogue, "
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.18, ease }}
-          className="max-w-xl text-sm leading-relaxed text-muted-foreground md:pb-2 md:text-base"
+          className="max-w-xl text-sm leading-relaxed text-muted-foreground max-md:hidden md:pb-2 md:text-base"
         >
           {intro.summary}
         </motion.p>
       </div>
 
-      <ul className="mt-4 grid grid-cols-2 gap-2.5 md:mt-8 md:gap-4">
+      <ul className="mt-4 grid grid-cols-2 gap-2.5 max-md:hidden md:mt-8 md:gap-4">
         {categories.map((c, i) => {
           const items = products.filter((p) => p.category === c.name);
           const active = category === c.name;

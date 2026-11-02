@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowCounterClockwiseIcon,
@@ -15,16 +15,15 @@ import {
   TrashIcon,
   type Icon,
 } from "@phosphor-icons/react";
-import EnquiryTrap, { useFillTimer } from "@/components/shared/EnquiryTrap";
+import EnquiryTrap from "@/components/shared/EnquiryTrap";
 import { Field, QuantityPicker } from "@/components/shared/QuoteProvider";
 import Thumb from "@/components/shared/Thumb";
 import type { ContactContent, ContactIntent } from "@/data/contact";
-import { enquiryHandoff, enquiryMessage, sendEnquiry, type EnquiryLine } from "@/lib/enquiry";
-import { haptic } from "@/lib/haptics";
 import { photoProps } from "@/lib/photo";
 import { button, container } from "@/lib/ui";
 import { useContactForm } from "./ContactProvider";
 import MessagePreview from "./MessagePreview";
+import { useContactSend } from "./useContactSend";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -40,26 +39,8 @@ const intentIcons: Record<ContactIntent["id"], Icon> = {
 export default function ContactDesk({ intro, intents }: Pick<ContactContent, "intro" | "intents">) {
   const formRef = useRef<HTMLFormElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { products, intent, lines, values, status, setValues, setStatus, chooseIntent, toggleProduct, updateLine, reset } = useContactForm();
-  const bySlug = new Map(products.map((p) => [p.slug, p]));
-  const fillTime = useFillTimer();
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
-
-  const items: EnquiryLine[] = intent.withProducts
-    ? lines.map((l) => ({
-        name: bySlug.get(l.slug)?.name ?? l.slug,
-        form: l.form,
-        ...(intent.withQuantity ? { qty: l.qty, unit: l.unit } : {}),
-      }))
-    : [];
-
-  const data = new FormData();
-  for (const [key, value] of Object.entries(values)) {
-    if (value && (key !== "city" || intent.withDelivery)) data.set(key, value);
-  }
-  const message = enquiryMessage(items, data, intent.subject);
-  const handoff = enquiryHandoff(message);
+  const { products, intent, lines, status, setValues, chooseIntent, toggleProduct, updateLine, reset } = useContactForm();
+  const { bySlug, message, handoff, sending, error, send } = useContactSend();
 
   function readForm() {
     if (!formRef.current) return;
@@ -72,34 +53,8 @@ export default function ContactDesk({ intro, intents }: Pick<ContactContent, "in
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (sending) return;
-    const form = new FormData(e.currentTarget);
-    const text = (key: string) => String(form.get(key) ?? "");
-    haptic(12);
-    setSending(true);
-    setError("");
-    try {
-      await sendEnquiry({
-        form: "contact",
-        subject: intent.subject,
-        company: text("company"),
-        name: text("name"),
-        contact: text("contact"),
-        city: intent.withDelivery ? text("city") : "",
-        message: text("notes"),
-        items,
-        source: `contact:${intent.id}`,
-        website: text("website"),
-        fillMs: fillTime(),
-      });
-      setStatus("sent");
-      // The form is taller than what replaces it, so bring the result into view.
-      cardRef.current?.scrollIntoView({ block: "start" });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't send your enquiry. Please try again.");
-    } finally {
-      setSending(false);
-    }
+    // The form is taller than what replaces it, so bring the result into view.
+    if (await send(new FormData(e.currentTarget))) cardRef.current?.scrollIntoView({ block: "start" });
   }
 
   return (

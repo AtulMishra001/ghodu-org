@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CatalogueHelp from "@/components/products/CatalogueHelp";
 import CatalogueHeader from "@/components/products/CatalogueHeader";
 import CatalogueProvider from "@/components/products/CatalogueProvider";
 import CatalogueResults from "@/components/products/CatalogueResults";
@@ -24,8 +25,11 @@ export default async function ProductsPage() {
         <CatalogueToolbar categories={catalogue.categories.map((c) => c.name)} />
         <CatalogueResults />
       </section>
-      <FaqSection index="01" title="Before you enquire" faqs={catalogue.faqs} />
-      <SourcingPanel sourcing={catalogue.sourcing} />
+      <CatalogueHelp faqs={catalogue.faqs} sourcing={catalogue.sourcing} />
+      <div className="max-md:hidden">
+        <FaqSection index="01" title="Before you enquire" faqs={catalogue.faqs} />
+        <SourcingPanel sourcing={catalogue.sourcing} />
+      </div>
       <EnquiryTray />
     </CatalogueProvider>
   );
