@@ -51,8 +51,10 @@ export default async function ArchiveView({ page = 1, category }: { page?: numbe
   const isRoot = !category && page === 1;
   const noun = posts.length === 1 ? "article" : "articles";
 
+  // One root element: Next scrolls a new page by its top-level elements, and with
+  // the invisible scripts first, several roots left phones part-way down the page.
   return (
-    <>
+    <div>
       <JsonLd data={breadcrumbSchema(crumbs)} />
       {isRoot && <JsonLd data={blogSchema(all, blogArchive.metaDescription)} />}
       {isRoot && <JsonLd data={faqPageSchema(blogArchive.faqs)} />}
@@ -260,7 +262,7 @@ export default async function ArchiveView({ page = 1, category }: { page?: numbe
         </div>
       </Section>
       </div>
-    </>
+    </div>
   );
 }
 

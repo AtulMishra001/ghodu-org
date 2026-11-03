@@ -4,27 +4,39 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
-import { BasketIcon, ChatCircleIcon, HouseIcon, PackageIcon, PlantIcon, type Icon } from "@phosphor-icons/react";
+import { ArrowRightIcon, BasketIcon, CaretRightIcon, ChatCircleIcon, HouseIcon, ListIcon, NewspaperIcon, PackageIcon, PlantIcon, type Icon } from "@phosphor-icons/react";
+import { nav } from "@/data/site";
 import { haptic } from "@/lib/haptics";
 import { setNavDirection } from "@/lib/nav-direction";
 import { isActivePath } from "./AppBar";
 import { useQuote } from "./QuoteProvider";
+import { Sheet } from "./Sheet";
 
 const tabs: { href: string; label: string; icon: Icon }[] = [
   { href: "/", label: "Home", icon: HouseIcon },
   { href: "/products", label: "Products", icon: PackageIcon },
   { href: "/about-us", label: "About", icon: PlantIcon },
-  { href: "/contact", label: "Contact", icon: ChatCircleIcon },
 ];
 
+// Every page without a tab goes in the Menu, so a page added to `nav` appears
+// there by itself. The icon and hint below are optional extras for known pages.
+const menuPages = nav.filter((page) => !tabs.some((tab) => tab.href === page.href));
+const menuDetails: Record<string, { icon: Icon; hint: string }> = {
+  "/blogs": { icon: NewspaperIcon, hint: "Buyer guides and harvest notes" },
+  "/contact": { icon: ChatCircleIcon, hint: "Send us an enquiry" },
+};
+
 // Docked, edge-to-edge bar with a sliding indicator on the top edge and the
-// enquiry basket in the middle. Hides while scrolling down, returns on scroll up.
+// enquiry basket in the middle. The last slot is a Menu of the pages without a
+// tab. Hides while scrolling down, returns on scroll up.
 export default function TabBar() {
   const pathname = usePathname();
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const quote = useQuote();
   const current = tabs.findIndex((t) => isActivePath(pathname, t.href));
+  const onMenuPage = menuPages.some((page) => isActivePath(pathname, page.href));
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
@@ -65,6 +77,7 @@ export default function TabBar() {
   };
 
   return (
+    <>
     <motion.nav
       data-chrome
       aria-label="Main"
@@ -102,7 +115,65 @@ export default function TabBar() {
           </motion.button>
         </li>
         {tabs.slice(2).map((t, i) => item(t, i + 2))}
+        <li className="relative h-full">
+          {onMenuPage && (
+            <motion.span
+              layoutId="tab-indicator"
+              className="absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-primary"
+              transition={{ type: "spring", stiffness: 500, damping: 40 }}
+            />
+          )}
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={menuOpen}
+            onClick={() => {
+              haptic(6);
+              setMenuOpen(true);
+            }}
+            className="flex h-full w-full flex-col items-center justify-center gap-1"
+          >
+            <motion.span whileTap={{ scale: 0.82 }} transition={{ type: "spring", stiffness: 600, damping: 28 }}>
+              <ListIcon size={24} weight={onMenuPage || menuOpen ? "duotone" : "light"} className={onMenuPage || menuOpen ? "text-primary" : "text-muted-foreground"} />
+            </motion.span>
+            <span className={`text-[11px] font-semibold ${onMenuPage || menuOpen ? "text-foreground" : "text-muted-foreground"}`}>Menu</span>
+          </button>
+        </li>
       </ul>
     </motion.nav>
+
+    {/* Outside the bar: its transform would otherwise trap this fixed sheet. */}
+    <Sheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
+      <ul className="divide-y border-y">
+        {menuPages.map((page) => {
+          const details = menuDetails[page.href];
+          const PageIcon = details?.icon ?? ArrowRightIcon;
+          const here = isActivePath(pathname, page.href);
+          return (
+            <li key={page.href}>
+              <Link
+                href={page.href}
+                aria-current={here ? "page" : undefined}
+                onClick={() => {
+                  haptic(5);
+                  setMenuOpen(false);
+                }}
+                className="flex items-center gap-3 py-3 transition active:opacity-60"
+              >
+                <span className="grid size-11 shrink-0 place-items-center rounded-tile bg-surface-muted text-primary">
+                  <PageIcon size={24} weight="duotone" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block leading-tight font-semibold">{page.label}</span>
+                  {details && <span className="mt-0.5 block truncate text-sm text-muted-foreground">{details.hint}</span>}
+                </span>
+                {here ? <span className="text-xs font-semibold text-primary">You&apos;re here</span> : <CaretRightIcon size={16} className="shrink-0 text-muted-foreground" />}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </Sheet>
+    </>
   );
 }
